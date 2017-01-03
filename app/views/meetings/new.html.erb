@@ -1,5 +1,17 @@
 <h1>Create a meeting</h1>
 
+<% if @meeting.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@meeting.errors.count, "error") %> prohibited this meeting from being saved:</h2>
+ 
+    <ul>
+    <% @meeting.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <%= form_tag "/meetings", method: :post do %>
   <div>
     <%= label_tag :name %>
@@ -11,18 +23,19 @@
   </div>
   <div>
     <%= label_tag :start_time %>
-    <%= datetime_local_field_tag :start_time, @meeting.start_time %>
+    <%= datetime_local_field_tag :start_time, (@meeting.start_time || DateTime.now).strftime("%Y-%m-%dT%H:%M") %>
   </div>
   <div>
     <%= label_tag :end_time %>
-    <%= datetime_local_field_tag :end_time, @meeting.end_time %>
+    <%= datetime_local_field_tag :end_time, (@meeting.end_time || DateTime.now + 1.hour).strftime("%Y-%m-%dT%H:%M") %>
   </div>
   <div>
     <%= label_tag :notes %>
-    <%= text_area_tag :notes %>
+    <%= text_area_tag :notes, @meeting.notes %>
   </div>
   <div>
-  <%= select_tag :tag_ids, options_from_collection_for_selecting(Tag.all, :id, :name), multiple: true %>
+  <%= label_tag :tags %>
+  <%= select_tag :tag_ids, options_from_collection_for_select(Tag.all, :id, :name), multiple: true %>
   </div>
   <div>
     <%= submit_tag %>
